@@ -34,6 +34,16 @@ class HotPotato:
         def Call(self, a):
             return a.func.id + '( ' + ' , '.join([self.hp._php(b) for b in a.args]) + ' )'
 
+        def If(self, a):
+            if a.orelse is None:
+                orelse = ''
+            elif a.orelse[0].__class__ is ast.If:
+                orelse = ' else' + self.hp._php(a.orelse[0])
+            else:
+                orelse = ' else {\n' + self.hp._php(a.orelse[0]) + '}'
+
+            return 'if ( ' + self.hp._php(a.test) + '){\n' + ';\n'.join([self.hp._php(b) for b in a.body]) + '}' + orelse
+
 
     def __init__(self, fn):
         self.ast = compile(open(fn).read(),
