@@ -4,8 +4,8 @@ import ast
 
 class HotPotato:
     def __init__(self, fn):
-        self.ast = compile(open('test.py').read(),
-                'test.py',
+        self.ast = compile(open(fn).read(),
+                fn,
                 'exec',
                 ast.PyCF_ONLY_AST)
 
@@ -62,5 +62,11 @@ class HotPotato:
         else:
             return repr(a.__class__)
 
-hp = HotPotato('test.py')
-print(hp.php())
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) == 2:
+        hp = HotPotato(sys.argv[1])
+        print(hp.php())
+    else:
+        print("Usage: python -m hp FILE.py")
+        exit(1)
