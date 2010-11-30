@@ -7,17 +7,20 @@ class HotPotato:
         def __init__(self, hp):
             self.hp = hp
 
+        def p(self, php):
+            return self.hp._php(php)
+
         def Module(self, a):
-            return '\n'.join([self.hp._php(b) for b in a.body])
+            return '\n'.join([self.p(b) for b in a.body])
 
         def Assign(self, a):
-            return self.hp._php(a.targets[0]) + ' = ' + self.hp._php(a.value) + ';'
+            return self.p(a.targets[0]) + ' = ' + self.p(a.value) + ';'
 
         def Name(self, a):
             return '$'+a.id
 
         def List(self, a):
-            return 'array( ' + ' , '.join([self.hp._php(e) for e in a.elts]) + ' )'
+            return 'array( ' + ' , '.join([self.p(e) for e in a.elts]) + ' )'
 
         def Num(self, a):
             return str(a.n)
@@ -26,26 +29,26 @@ class HotPotato:
             return "'" + a.s + "'"
 
         def For(self, a):
-            return 'foreach ( ' + self.hp._php(a.iter) + ' as ' + self.hp._php(a.target) + ') {\n' + ';\n'.join([self.hp._php(b) for b in a.body]) + '}'
+            return 'foreach ( ' + self.p(a.iter) + ' as ' + self.p(a.target) + ') {\n' + ';\n'.join([self.p(b) for b in a.body]) + '}'
 
         def Expr(self, a):
-            return self.hp._php(a.value) + ';\n'
+            return self.p(a.value) + ';\n'
 
         def Call(self, a):
-            return a.func.id + '( ' + ' , '.join([self.hp._php(b) for b in a.args]) + ' )'
+            return a.func.id + '( ' + ' , '.join([self.p(b) for b in a.args]) + ' )'
 
         def If(self, a):
             if a.orelse is None:
                 orelse = ''
             elif a.orelse[0].__class__ is ast.If:
-                orelse = ' else' + self.hp._php(a.orelse[0])
+                orelse = ' else' + self.p(a.orelse[0])
             else:
-                orelse = ' else {\n' + self.hp._php(a.orelse[0]) + '}'
+                orelse = ' else {\n' + self.p(a.orelse[0]) + '}'
 
-            return 'if ( ' + self.hp._php(a.test) + ' ){\n' + ';\n'.join([self.hp._php(b) for b in a.body]) + '}' + orelse
+            return 'if ( ' + self.p(a.test) + ' ){\n' + ';\n'.join([self.p(b) for b in a.body]) + '}' + orelse
 
         def UnaryOp(self, a):
-            return self.hp._php(a.op) + ' ' + self.hp._php(a.operand)
+            return self.p(a.op) + ' ' + self.p(a.operand)
 
         def Not(self, a):
             return '!'
@@ -55,7 +58,7 @@ class HotPotato:
             print(a.comparators)
             print(a.left)
             print(a.ops)
-            return self.hp._php(a.left) + ' ' + self.hp._php(a.ops[0]) + ' ' + self.hp._php(a.comparators[0])
+            return self.p(a.left) + ' ' + self.p(a.ops[0]) + ' ' + self.p(a.comparators[0])
 
         def Eq(self, a):
             return '==='
