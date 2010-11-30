@@ -4,6 +4,15 @@ import ast
 
 class HotPotato:
     class Actions:
+
+        special_names = {
+                'False': 'false',
+                'None': 'null',
+                'True': 'true'
+                }
+
+        ######################################################################
+
         def __init__(self, hp):
             self.hp = hp
 
@@ -42,6 +51,8 @@ class HotPotato:
             return a.func.id + '( ' + ' , '.join([self.p(b) for b in a.args]) + ' )'
 
         def Name(self, a):
+            if a.id in self.special_names:
+                return self.special_names[a.id]
             return '$'+a.id
 
         ## Operators #########################################################
