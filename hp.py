@@ -26,6 +26,9 @@ class HotPotato:
 
         ## Statements ########################################################
 
+        def statements(self, s):
+            return ';\n'.join([self.p(b) for b in s])
+
         def Assign(self, a):
             return self.p(a.targets[0]) + ' = ' + self.p(a.value) + ';'
 
@@ -33,7 +36,7 @@ class HotPotato:
             return 'foreach ( ' + \
                     self.p(a.iter) +  ' as ' +  self.p(a.target) + \
                     ') {\n' + \
-                    ';\n'.join([self.p(b) for b in a.body]) + \
+                    self.statements(a.body) + \
                     '}'
 
         def If(self, a):
@@ -45,7 +48,7 @@ class HotPotato:
                 orelse = ' else {\n' + self.p(a.orelse[0]) + '}'
 
             return 'if ( ' + self.p(a.test) + ' ){\n' + \
-                    ';\n'.join([self.p(b) for b in a.body]) + '}' + orelse
+                    self.statements(a.body) + '}' + orelse
 
         ## Expressions #######################################################
 
@@ -54,7 +57,7 @@ class HotPotato:
 
         def Call(self, a):
             return a.func.id + '( ' + \
-                    ' , '.join([self.p(b) for b in a.args]) + ' )'
+                    ', '.join([self.p(b) for b in a.args]) + ' )'
 
         def Name(self, a):
             if a.id in self.special_names:
@@ -92,7 +95,7 @@ class HotPotato:
         ## Builtin types #####################################################
 
         def List(self, a):
-            return 'array( ' + ' , '.join([self.p(e) for e in a.elts]) + ' )'
+            return 'array( ' + ', '.join([self.p(e) for e in a.elts]) + ' )'
 
         def Num(self, a):
             return str(a.n)
