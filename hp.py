@@ -40,14 +40,14 @@ class HotPotato:
                     '}'
 
         def If(self, a):
-            if a.orelse is None:
+            if a.orelse == []:
                 orelse = ''
             elif a.orelse[0].__class__ is ast.If:
                 orelse = ' else' + self.p(a.orelse[0])
             else:
                 orelse = ' else {\n' + self.p(a.orelse[0]) + '}'
 
-            return 'if ( ' + self.p(a.test) + ' ){\n' + \
+            return 'if ( ' + self.p(a.test) + ' ) {\n' + \
                     self.statements(a.body) + '}' + orelse
 
         ## Expressions #######################################################
