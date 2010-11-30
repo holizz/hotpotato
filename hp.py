@@ -110,7 +110,8 @@ class HotPotato:
                                 ')'
 
 
-    def __init__(self, fn):
+    def __init__(self, fn, debug):
+        self.debug = debug
         self.ast = compile(open(fn).read(),
                 fn,
                 'exec',
@@ -125,14 +126,24 @@ class HotPotato:
         try:
             return actions.__getattribute__(c.__name__)(a)
         except AttributeError:
-            return repr(a)
+            if debug:
+                return repr(a)
+            else:
+                raise
 
 
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) == 2:
-        hp = HotPotato(sys.argv[1])
+    argv = sys.argv[1:]
+    debug = False
+    if '-d' in argv:
+        argv.remove('-d')
+        debug = True
+
+    if len(argv) == 1:
+        hp = HotPotato(argv[0], debug)
         print(hp.php())
+
     else:
         print("Usage: python -m hp FILE.py")
         exit(1)
