@@ -108,6 +108,21 @@ class Actions:
     def Eq(self, a):
         return '==='
 
+    def NotEq(self, a):
+        return '!=='
+
+    def Lt(self, a):
+        return '<'
+
+    def Gt(self, a):
+        return '>'
+
+    def LtE(self, a):
+        return '<='
+
+    def GtE(self, a):
+        return '>='
+
     ## Builtin types #########################################################
 
     def Num(self, a):
