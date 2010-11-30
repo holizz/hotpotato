@@ -30,7 +30,11 @@ class HotPotato:
             return self.p(a.targets[0]) + ' = ' + self.p(a.value) + ';'
 
         def For(self, a):
-            return 'foreach ( ' + self.p(a.iter) + ' as ' + self.p(a.target) + ') {\n' + ';\n'.join([self.p(b) for b in a.body]) + '}'
+            return 'foreach ( ' + \
+                    self.p(a.iter) +  ' as ' +  self.p(a.target) + \
+                    ') {\n' + \
+                    ';\n'.join([self.p(b) for b in a.body]) + \
+                    '}'
 
         def If(self, a):
             if a.orelse is None:
@@ -40,7 +44,8 @@ class HotPotato:
             else:
                 orelse = ' else {\n' + self.p(a.orelse[0]) + '}'
 
-            return 'if ( ' + self.p(a.test) + ' ){\n' + ';\n'.join([self.p(b) for b in a.body]) + '}' + orelse
+            return 'if ( ' + self.p(a.test) + ' ){\n' + \
+                    ';\n'.join([self.p(b) for b in a.body]) + '}' + orelse
 
         ## Expressions #######################################################
 
@@ -48,7 +53,8 @@ class HotPotato:
             return self.p(a.value) + ';\n'
 
         def Call(self, a):
-            return a.func.id + '( ' + ' , '.join([self.p(b) for b in a.args]) + ' )'
+            return a.func.id + '( ' + \
+                    ' , '.join([self.p(b) for b in a.args]) + ' )'
 
         def Name(self, a):
             if a.id in self.special_names:
@@ -76,7 +82,9 @@ class HotPotato:
         ## Compare
 
         def Compare(self, a):
-            return self.p(a.left) + ' ' + self.p(a.ops[0]) + ' ' + self.p(a.comparators[0])
+            return self.p(a.left) + \
+                    ' ' + self.p(a.ops[0]) + ' ' + \
+                    self.p(a.comparators[0])
 
         def Eq(self, a):
             return '==='
