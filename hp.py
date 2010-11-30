@@ -3,6 +3,19 @@
 import ast
 
 class HotPotato:
+    class Macros:
+        def __init__(self, hp):
+            self.hp = hp
+
+        def p(self, php):
+            return self.hp._php(php)
+
+        def _concat(self, *args):
+            return ' . '.join([self.p(a) for a in args])
+
+        def _const(self, constant):
+            return constant.id
+
     class Actions:
 
         special_names = {
@@ -56,8 +69,12 @@ class HotPotato:
             return self.p(a.value) + ';\n'
 
         def Call(self, a):
-            return a.func.id + '( ' + \
-                    ', '.join([self.p(b) for b in a.args]) + ' )'
+            m = self.hp.Macros(self.hp)
+            if a.func.id in dir(m):
+                return m.__getattribute__(a.func.id)(*a.args)
+            else:
+                return a.func.id + '( ' + \
+                        ', '.join([self.p(b) for b in a.args]) + ' )'
 
         def Name(self, a):
             if a.id in self.special_names:
