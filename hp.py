@@ -42,7 +42,23 @@ class HotPotato:
             else:
                 orelse = ' else {\n' + self.hp._php(a.orelse[0]) + '}'
 
-            return 'if ( ' + self.hp._php(a.test) + '){\n' + ';\n'.join([self.hp._php(b) for b in a.body]) + '}' + orelse
+            return 'if ( ' + self.hp._php(a.test) + ' ){\n' + ';\n'.join([self.hp._php(b) for b in a.body]) + '}' + orelse
+
+        def UnaryOp(self, a):
+            return self.hp._php(a.op) + ' ' + self.hp._php(a.operand)
+
+        def Not(self, a):
+            return '!'
+
+        def Compare(self, a):
+            print(dir(a))
+            print(a.comparators)
+            print(a.left)
+            print(a.ops)
+            return self.hp._php(a.left) + ' ' + self.hp._php(a.ops[0]) + ' ' + self.hp._php(a.comparators[0])
+
+        def Eq(self, a):
+            return '==='
 
 
     def __init__(self, fn):
