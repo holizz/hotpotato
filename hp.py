@@ -90,7 +90,7 @@ class HotPotato:
             return str(a.n)
 
         def Str(self, a):
-            return "'" + a.s + "'"
+            return "'" + a.s.replace('\\','\\\\').replace("'","\\'") + "'"
 
 
     def __init__(self, fn):
