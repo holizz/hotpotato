@@ -10,32 +10,18 @@ class HotPotato:
         def p(self, php):
             return self.hp._php(php)
 
+        ## Module ############################################################
+
         def Module(self, a):
             return '\n'.join([self.p(b) for b in a.body])
+
+        ## Statements ########################################################
 
         def Assign(self, a):
             return self.p(a.targets[0]) + ' = ' + self.p(a.value) + ';'
 
-        def Name(self, a):
-            return '$'+a.id
-
-        def List(self, a):
-            return 'array( ' + ' , '.join([self.p(e) for e in a.elts]) + ' )'
-
-        def Num(self, a):
-            return str(a.n)
-
-        def Str(self, a):
-            return "'" + a.s + "'"
-
         def For(self, a):
             return 'foreach ( ' + self.p(a.iter) + ' as ' + self.p(a.target) + ') {\n' + ';\n'.join([self.p(b) for b in a.body]) + '}'
-
-        def Expr(self, a):
-            return self.p(a.value) + ';\n'
-
-        def Call(self, a):
-            return a.func.id + '( ' + ' , '.join([self.p(b) for b in a.args]) + ' )'
 
         def If(self, a):
             if a.orelse is None:
@@ -46,6 +32,19 @@ class HotPotato:
                 orelse = ' else {\n' + self.p(a.orelse[0]) + '}'
 
             return 'if ( ' + self.p(a.test) + ' ){\n' + ';\n'.join([self.p(b) for b in a.body]) + '}' + orelse
+
+        ## Expressions #######################################################
+
+        def Expr(self, a):
+            return self.p(a.value) + ';\n'
+
+        def Call(self, a):
+            return a.func.id + '( ' + ' , '.join([self.p(b) for b in a.args]) + ' )'
+
+        def Name(self, a):
+            return '$'+a.id
+
+        ## Operators #########################################################
 
         def UnaryOp(self, a):
             return self.p(a.op) + ' ' + self.p(a.operand)
@@ -62,6 +61,17 @@ class HotPotato:
 
         def Eq(self, a):
             return '==='
+
+        ## Builtin types #####################################################
+
+        def List(self, a):
+            return 'array( ' + ' , '.join([self.p(e) for e in a.elts]) + ' )'
+
+        def Num(self, a):
+            return str(a.n)
+
+        def Str(self, a):
+            return "'" + a.s + "'"
 
 
     def __init__(self, fn):
