@@ -94,14 +94,20 @@ class HotPotato:
 
         ## Builtin types #####################################################
 
-        def List(self, a):
-            return 'array( ' + ', '.join([self.p(e) for e in a.elts]) + ' )'
-
         def Num(self, a):
             return str(a.n)
 
         def Str(self, a):
             return "'" + a.s.replace('\\','\\\\').replace("'","\\'") + "'"
+
+        def List(self, a):
+            return 'array( ' + ', '.join([self.p(e) for e in a.elts]) + ' )'
+
+        def Dict(self, a):
+            return 'array(' + \
+                    ', '.join([self.p(k) + ' => ' + self.p(v)
+                        for k,v in zip(a.keys, a.values)]) + \
+                                ')'
 
 
     def __init__(self, fn):
