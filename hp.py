@@ -57,17 +57,25 @@ class HotPotato:
 
         ## Operators #########################################################
 
+        ## UnaryOp
+
         def UnaryOp(self, a):
             return self.p(a.op) + ' ' + self.p(a.operand)
 
         def Not(self, a):
             return '!'
 
+        ## BinOp
+
+        def BinOp(self, a):
+            return self.p(a.left) + ' ' + self.p(a.op) + ' ' + self.p(a.right)
+
+        def Add(self, a):
+            return '+'
+
+        ## Compare
+
         def Compare(self, a):
-            print(dir(a))
-            print(a.comparators)
-            print(a.left)
-            print(a.ops)
             return self.p(a.left) + ' ' + self.p(a.ops[0]) + ' ' + self.p(a.comparators[0])
 
         def Eq(self, a):
