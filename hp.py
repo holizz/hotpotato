@@ -15,6 +15,9 @@ class Macros:
     def _const(self, constant):
         return constant.id
 
+    def _append(self, target, value):
+        return self.p(target) + '[] = ' + self.p(value)
+
 
 class Actions:
     special_names = {
@@ -116,7 +119,7 @@ class Actions:
         for_.target = g.target
         for_.body = [ast.Call()]
         for_.body[0].func = ast.Name
-        for_.body[0].func.id = 'array_push'
+        for_.body[0].func.id = '_append'
         for_.body[0].args = [target, a.elt]
         trees.append(for_)
 
