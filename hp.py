@@ -43,13 +43,15 @@ class Actions:
 
     def Module(self, a):
         self.statement_context = True
-        return ';\n'.join(self.output + [self.p(b) for b in a.body] + [''])
+        return self.statements(a.body)
 
     ## Statements ############################################################
 
     def statements(self, s):
         self.statement_context = True
-        return ';\n'.join(self.output + [self.p(b) for b in s] + [''])
+        for b in s:
+            self.output.append(self.p(b))
+        return ';\n'.join(self.output + [''])
 
     def Assign(self, a):
         return self.p(a.targets[0]) + ' = ' + self.p(a.value)
