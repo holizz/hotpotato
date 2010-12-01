@@ -280,7 +280,7 @@ if __name__ == '__main__':
 
     if len(argv) == 1:
         hp = HotPotato(argv[0], debug)
-        print(hp.php())
+        print(hp.php(), end='')
 
     else:
         print("Usage: python -m hp FILE.py")

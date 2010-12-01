@@ -1,0 +1,29 @@
+= Python Hot Potato
+
+PyHP is an alternate syntax for PHP
+
+== Examples
+
+ % cat > test.py <<END
+ a,b = 2,3
+ print_r([x**(a*b) for x in [1,2,3]])
+ END
+ % python -m hp test.py
+ <?php
+ $__pyhp_assign_0__ = array( 2, 3 );
+ $a = array_shift( $__pyhp_assign_0__ );
+ $b = array_shift( $__pyhp_assign_0__ );
+ ;
+ $__pyhp_lstcmp_0__ = array(  );
+ foreach ( array( 1, 2, 3 ) as $x) {
+ $__pyhp_lstcmp_0__[] = pow($x, $a * $b);
+ };
+ ;
+ print_r( $__pyhp_lstcmp_0__ );
+ % python -m hp test.py | php
+ Array
+ (
+     [0] => 1
+     [1] => 64
+     [2] => 729
+ )
