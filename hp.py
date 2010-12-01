@@ -93,6 +93,8 @@ class Actions:
     ## BinOp
 
     def BinOp(self, a):
+        if type(a.op) == ast.Pow:
+            return 'pow(' + self.p(a.left) + ', ' + self.p(a.right) + ')'
         return self.p(a.left) + ' ' + self.p(a.op) + ' ' + self.p(a.right)
 
     def Add(self, a):
