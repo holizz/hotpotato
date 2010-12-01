@@ -33,9 +33,16 @@ class Actions:
         self.parent = parent
         self.output = []
         self.statement_context = False
+        self.var_count = 0
 
     def p(self, php):
         return self.hp._php(php, self)
+
+    def pyhp_var(self, name):
+        var = ast.Name()
+        var.id = '__pyhp_' + name + '_' + str(self.var_count) + '__'
+        self.var_count += 1
+        return var
 
     def _get_context(self):
         if self.statement_context:
@@ -64,8 +71,7 @@ class Actions:
 
             # $__pyhp_array__ = $values
             assign = ast.Assign()
-            target = ast.Name()
-            target.id = '__pyhp_array__'
+            target = self.pyhp_var('assign')
             assign.targets = [target]
             assign.value = a.value
 
@@ -138,8 +144,7 @@ class Actions:
 
         # $__pyhp_array__ = $values
         assign = ast.Assign()
-        target = ast.Name()
-        target.id = '__pyhp_array__'
+        target = self.pyhp_var('lstcmp')
         assign.targets = [target]
         assign.value = ast.List()
         assign.value.elts = []
