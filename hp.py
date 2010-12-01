@@ -7,7 +7,7 @@ class Macros:
         self.hp = hp
 
     def p(self, php):
-        return self.hp._php(php)
+        return self.hp._php(php, self)
 
     def _concat(self, *args):
         return ' . '.join([self.p(a) for a in args])
@@ -25,24 +25,37 @@ class Actions:
 
     ##########################################################################
 
-    def __init__(self, hp):
+    def __init__(self, hp, parent):
         self.hp = hp
+        self.parent = parent
+        self.output = []
+        self.statement_context = False
 
     def p(self, php):
-        return self.hp._php(php)
+        return self.hp._php(php, self)
+
+    def _get_context(self):
+        if self.statement_context:
+            return self
+        return self.parent._get_context()
 
     ## Module ################################################################
 
     def Module(self, a):
-        return '\n'.join([self.p(b) for b in a.body])
+        self.statement_context = True
+        return ';\n'.join(self.output + [self.p(b) for b in a.body] + [''])
 
     ## Statements ############################################################
 
     def statements(self, s):
-        return ';\n'.join([self.p(b) for b in s])
+        self.statement_context = True
+        return ';\n'.join(self.output + [self.p(b) for b in s] + [''])
 
     def Assign(self, a):
-        return self.p(a.targets[0]) + ' = ' + self.p(a.value) + ';'
+        return self.p(a.targets[0]) + ' = ' + self.p(a.value)
+
+    def Expr(self, a):
+        return self.p(a.value)
 
     def For(self, a):
         return 'foreach ( ' + \
@@ -64,9 +77,6 @@ class Actions:
 
     ## Expressions ###########################################################
 
-    def Expr(self, a):
-        return self.p(a.value) + ';\n'
-
     def Call(self, a):
         m = self.hp.macros(self.hp)
         if a.func.id in dir(m):
@@ -85,6 +95,31 @@ class Actions:
 
     def Index(self, a):
         return self.p(a.value)
+
+    def ListComp(self, a):
+        g = a.generators[0]
+
+        trees = []
+
+        assign = ast.Assign()
+        target = ast.Name()
+        target.id = '__pyhp_array__'
+        assign.targets = [target]
+        assign.value = ast.List()
+        assign.value.elts = []
+        trees.append(assign)
+
+        for_ = ast.For()
+        for_.iter = g.iter
+        for_.target = g.target
+        for_.body = [ast.Call()]
+        for_.body[0].func = ast.Name
+        for_.body[0].func.id = 'array_push'
+        for_.body[0].args = [target, a.elt]
+        trees.append(for_)
+
+        self._get_context().output.append(self.statements(trees))
+        return self.p(target)
 
     ## Operators #############################################################
 
@@ -163,11 +198,11 @@ class HotPotato:
                 ast.PyCF_ONLY_AST)
 
     def php(self):
-        return '<?php\n'+self._php(self.ast)
+        return '<?php\n'+self._php(self.ast, None)
 
-    def _php(self, a):
+    def _php(self, a, parent):
         c = a.__class__
-        actions = Actions(self)
+        actions = Actions(self, parent)
         try:
             return actions.__getattribute__(c.__name__)(a)
         except AttributeError:
