@@ -62,6 +62,7 @@ class Actions:
     def Assign(self, a):
         if type(a.targets[0]) == ast.Tuple:
 
+            # $__pyhp_array__ = $values
             assign = ast.Assign()
             target = ast.Name()
             target.id = '__pyhp_array__'
@@ -72,8 +73,8 @@ class Actions:
 
             targets = a.targets[0].elts
 
-            n = 0
             for t in targets:
+                # $target = $value[$n]
                 assign = ast.Assign()
                 assign.targets = [t]
                 v = ast.Call()
@@ -82,7 +83,6 @@ class Actions:
                 v.args = [target]
                 assign.value = v
                 assignments.append(assign)
-                n += 1
 
             return self.statements(assignments)
 
@@ -136,6 +136,7 @@ class Actions:
 
         trees = []
 
+        # $__pyhp_array__ = $values
         assign = ast.Assign()
         target = ast.Name()
         target.id = '__pyhp_array__'
@@ -144,6 +145,7 @@ class Actions:
         assign.value.elts = []
         trees.append(assign)
 
+        # foreach ( $iter as $target ) { $elt }
         for_ = ast.For()
         for_.iter = g.iter
         for_.target = g.target
