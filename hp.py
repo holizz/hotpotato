@@ -80,6 +80,12 @@ class Actions:
             return self.special_names[a.id]
         return '$'+a.id
 
+    def Subscript(self, a):
+        return self.p(a.value) + '[' + self.p(a.slice) + ']'
+
+    def Index(self, a):
+        return self.p(a.value)
+
     ## Operators #############################################################
 
     ## UnaryOp
@@ -141,6 +147,9 @@ class Actions:
                 ', '.join([self.p(k) + ' => ' + self.p(v)
                     for k,v in zip(a.keys, a.values)]) + \
                             ')'
+
+    def NoneType(self, a):
+        return 'null'
 
 
 class HotPotato:
