@@ -53,11 +53,41 @@ class Actions:
     def statements(self, s):
         self.statement_context = True
         for b in s:
-            self.output.append(self.p(b))
+            if type(b) == str:
+                self.output.append(b)
+            else:
+                self.output.append(self.p(b))
         return ';\n'.join(self.output + [''])
 
     def Assign(self, a):
-        return self.p(a.targets[0]) + ' = ' + self.p(a.value)
+        if type(a.targets[0]) == ast.Tuple:
+
+            assign = ast.Assign()
+            target = ast.Name()
+            target.id = '__pyhp_array__'
+            assign.targets = [target]
+            assign.value = a.value
+
+            assignments = [assign]
+
+            targets = a.targets[0].elts
+
+            n = 0
+            for t in targets:
+                assign = ast.Assign()
+                assign.targets = [t]
+                v = ast.Call()
+                v.func = ast.Name()
+                v.func.id = 'array_shift'
+                v.args = [target]
+                assign.value = v
+                assignments.append(assign)
+                n += 1
+
+            return self.statements(assignments)
+
+        else:
+            return self.p(a.targets[0]) + ' = ' + self.p(a.value)
 
     def Expr(self, a):
         return self.p(a.value)
@@ -146,6 +176,9 @@ class Actions:
     def Add(self, a):
         return '+'
 
+    def Mult(self, a):
+        return '*'
+
     ## Compare
 
     def Compare(self, a):
@@ -181,6 +214,9 @@ class Actions:
 
     def List(self, a):
         return 'array( ' + ', '.join([self.p(e) for e in a.elts]) + ' )'
+
+    def Tuple(self, a):
+        return self.List(a)
 
     def Dict(self, a):
         return 'array(' + \
