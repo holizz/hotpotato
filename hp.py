@@ -2,7 +2,7 @@
 
 import ast
 
-class Macros:
+class Macros(object):
     def __init__(self, hp):
         self.hp = hp
 
@@ -19,7 +19,7 @@ class Macros:
         return self.p(target) + '[] = ' + self.p(value)
 
 
-class Actions:
+class Actions(object):
     special_names = {
             'False': 'false',
             'None': 'null',
@@ -235,7 +235,7 @@ class Actions:
         return 'null'
 
 
-class HotPotato:
+class HotPotato(object):
     def __init__(self, fn, debug=False, macros=Macros):
         self.debug = debug
         self.macros = macros
@@ -260,7 +260,7 @@ class HotPotato:
                 raise
 
 
-class Compiler:
+class Compiler(object):
     def __init__(self, macros=Macros):
         self.macros = macros
 
@@ -280,7 +280,7 @@ if __name__ == '__main__':
 
     if len(argv) == 1:
         hp = HotPotato(argv[0], debug)
-        print(hp.php(), end='')
+        print(hp.php().strip())
 
     else:
         print("Usage: python -m hp FILE.py")
