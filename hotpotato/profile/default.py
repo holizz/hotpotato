@@ -38,8 +38,7 @@ class Actions(object):
         return self.hp._php(php, self)
 
     def pyhp_var(self, name):
-        var = ast.Name()
-        var.id = '__pyhp_' + name + '_' + str(self.var_count) + '__'
+        var = ast.Name(id='__pyhp_' + name + '_' + str(self.var_count) + '__')
         self.var_count += 1
         return var
 
@@ -69,10 +68,9 @@ class Actions(object):
         if type(a.targets[0]) == ast.Tuple:
 
             # $__pyhp_array__ = $values
-            assign = ast.Assign()
             target = self.pyhp_var('assign')
-            assign.targets = [target]
-            assign.value = a.value
+            assign = ast.Assign(targets=[target],
+                                value=a.value)
 
             assignments = [assign]
 
@@ -80,13 +78,9 @@ class Actions(object):
 
             for t in targets:
                 # $target = $value[$n]
-                assign = ast.Assign()
-                assign.targets = [t]
-                v = ast.Call()
-                v.func = ast.Name()
-                v.func.id = 'array_shift'
-                v.args = [target]
-                assign.value = v
+                assign = ast.Assign(targets=[t],
+                                    value=ast.Call(func=ast.Name(id='array_shift'),
+                                                   args=[target]))
                 assignments.append(assign)
 
             return self.statements(assignments)
@@ -142,21 +136,16 @@ class Actions(object):
         trees = []
 
         # $__pyhp_array__ = $values
-        assign = ast.Assign()
         target = self.pyhp_var('lstcmp')
-        assign.targets = [target]
-        assign.value = ast.List()
-        assign.value.elts = []
+        assign = ast.Assign(targets=[target],
+                            value=ast.List(elts=[]))
         trees.append(assign)
 
         # foreach ( $iter as $target ) { $elt }
-        for_ = ast.For()
-        for_.iter = g.iter
-        for_.target = g.target
-        for_.body = [ast.Call()]
-        for_.body[0].func = ast.Name
-        for_.body[0].func.id = '_append'
-        for_.body[0].args = [target, a.elt]
+        for_ = ast.For(iter=g.iter,
+                       target=g.target,
+                       body=[ast.Call(func=ast.Name(id='_append'),
+                                      args=[target, a.elt])])
         trees.append(for_)
 
         self._get_context().output.append(self.statements(trees))
