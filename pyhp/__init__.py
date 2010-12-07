@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import ast
 
 class Macros(object):
@@ -185,6 +183,9 @@ class Actions(object):
 
     def Mult(self, a):
         return '*'
+
+    def Mod(self, a):
+        return '%'
 
     ## Compare
 
