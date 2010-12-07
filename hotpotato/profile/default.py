@@ -5,17 +5,17 @@ class Macros(object):
     def __init__(self, hp):
         self.hp = hp
 
-    def p(self, php):
+    def __p(self, php):
         return self.hp._php(php, self)
 
     def _concat(self, *args):
-        return ' . '.join([self.p(a) for a in args])
+        return ' . '.join([self.__p(a) for a in args])
 
     def _const(self, constant):
         return constant.id
 
     def _append(self, target, value):
-        return self.p(target) + '[] = ' + self.p(value)
+        return self.__p(target) + '[] = ' + self.__p(value)
 
 
 class Actions(object):
@@ -113,7 +113,7 @@ class Actions(object):
 
     def Call(self, a):
         m = self.hp.macros(self.hp)
-        if a.func.id in dir(m):
+        if a.func.id in dir(m) and not a.func.id.startswith('__'):
             return m.__getattribute__(a.func.id)(*a.args)
         else:
             return a.func.id + '( ' + \
