@@ -262,18 +262,6 @@ class HotPotato(object):
                 raise
 
 
-class Compiler(object):
-    def __init__(self, macros=Macros):
-        self.macros = macros
-
-    def compile(self, files):
-        for f in files:
-            hp = HotPotato()
-            hp.load(f)
-            with open(f.replace('.py', '.php'), 'w+') as out:
-                out.write(hp.php())
-
-
 class CommandLine(object):
     def __init__(self, hotpotato=None):
         self.hotpotato = hotpotato if hotpotato else HotPotato()
