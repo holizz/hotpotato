@@ -236,12 +236,13 @@ class Actions(object):
 
 
 class HotPotato(object):
-    def __init__(self, fn, debug=False, macros=Macros):
+    def __init__(self, debug=False, macros=Macros):
         self.debug = debug
         self.macros = macros
 
-        self.ast = compile(open(fn).read(),
-                fn,
+    def load(self, f):
+        self.ast = compile(open(f).read(),
+                f,
                 'exec',
                 ast.PyCF_ONLY_AST)
 
@@ -266,22 +267,29 @@ class Compiler(object):
 
     def compile(self, files):
         for f in files:
-            hp = HotPotato(f, macros=self.macros)
+            hp = HotPotato()
+            hp.load(f)
             with open(f.replace('.py', '.php'), 'w+') as out:
                 out.write(hp.php())
 
-if __name__ == '__main__':
-    import sys
-    argv = sys.argv[1:]
-    debug = False
-    if '-d' in argv:
-        argv.remove('-d')
-        debug = True
 
-    if len(argv) == 1:
-        hp = HotPotato(argv[0], debug)
-        print(hp.php().strip())
+class CommandLine(object):
+    def __init__(self, hotpotato=None):
+        self.hotpotato = hotpotato if hotpotato else HotPotato()
 
-    else:
-        print("Usage: python -m hp FILE.py")
-        exit(1)
+    def run(self):
+        import sys
+        argv = sys.argv[1:]
+        debug = False
+        if '-d' in argv:
+            argv.remove('-d')
+            debug = True
+        self.hotpotato.debug = debug
+
+        if len(argv) == 1:
+            self.hotpotato.load(argv[0])
+            print(self.hotpotato.php().strip())
+
+        else:
+            print("Usage: pyhp FILE")
+            exit(1)

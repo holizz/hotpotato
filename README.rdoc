@@ -8,7 +8,7 @@ PyHP is an alternate syntax for PHP
  a,b = 2,3
  print_r([x**(a*b) for x in [1,2,3]])
  END
- % python -m hp test.py
+ % PYTHONPATH=. bin/pyhp test.py
  <?php
  $__pyhp_assign_0__ = array( 2, 3 );
  $a = array_shift( $__pyhp_assign_0__ );
@@ -27,3 +27,7 @@ PyHP is an alternate syntax for PHP
      [1] => 64
      [2] => 729
  )
+
+== Inspiration
+
+- CoffeeScript[http://jashkenas.github.com/coffee-script/]
