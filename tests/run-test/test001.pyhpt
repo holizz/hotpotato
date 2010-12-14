@@ -1,0 +1,6 @@
+--TEST--
+EXPECT
+--FILE--
+echo("""abc""")
+--EXPECT--
+abc

@@ -9,11 +9,14 @@ class HotPotato(object):
         self.actions = actions
         self.macros = macros
 
-    def load(self, f):
-        self.ast = compile(open(f).read(),
-                f,
-                'exec',
-                ast.PyCF_ONLY_AST)
+    def load(self, fn, s=None):
+        if s is None:
+            s = open(fn).read()
+
+        self.ast = compile(s,
+                           fn,
+                           'exec',
+                           ast.PyCF_ONLY_AST)
 
     def php(self):
         return '<?php\n'+self._php(self.ast, None)
