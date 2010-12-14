@@ -3,6 +3,7 @@
 import glob
 import io
 import os
+import re
 import subprocess
 import sys
 
@@ -63,18 +64,37 @@ class Test:
         self.php_output = self.raw_php_output.decode('utf-8')
 
         if self.expect is not None:
-            try:
-                assert self.php_output == self.expect
-            except AssertionError:
-                print('Failure!')
-                print('Expected ...\n%s\nto match\n%s' % (repr(self.php_output), repr(self.expect)))
-                raise
-            else:
-                print('Success!')
+            assertion = self.php_output == self.expect
+
         elif self.expectf is not None:
-            raise NotImplementedError
+            # Convert self.expectf to re
+            e = re.escape(self.expectf)
+            e = re.sub(r'\\\n', '\n', e)
+            e = re.sub(r'\\%d', r'\d+', e)
+            e = re.sub(r'\\%i', r'[+-]?\d+', e)
+            e = re.sub(r'\\%f', r'[+-]?\d+(\.\d+)?', e)
+            e = re.sub(r'\\%s', r'\w+', e)
+            e = re.sub(r'\\%x', r'[0-9a-fA-F]+', e)
+            e = re.sub(r'\\%c', r'\w', e)
+            e = '^'+e+'$'
+            regex = re.compile(e)
+
+            assertion = regex.match(self.php_output) is not None
+
         else:
             raise RuntimeError
+
+        try:
+            assert assertion
+        except AssertionError:
+            print('Failure!')
+            if self.expect is not None:
+                print('Expected\n%s\nto be\n%s' % (repr(self.php_output), repr(self.expect)))
+            elif self.expectf is not None:
+                print('Expected\n%s\nto match\n%s' % (repr(self.php_output), repr(self.expectf)))
+            raise
+        else:
+            print('Success!')
 
 
 if __name__ == '__main__':
