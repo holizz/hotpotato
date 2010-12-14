@@ -16,15 +16,17 @@ class Test:
         self.parse()
 
     def parse(self):
-        header = {'--TEST--':    'test',
-                  '--FILE--':    'file',
-                  '--EXPECT--':  'expect',
-                  '--EXPECTF--': 'expectf'}
+        header = {'--TEST--':        'test',
+                  '--FILE--':        'file',
+                  '--EXPECT--':      'expect',
+                  '--EXPECTF--':     'expectf',
+                  '--EXPECTREGEX--': 'expectregex'}
 
-        data = {'test':    None,
-                'file':    None,
-                'expect':  None,
-                'expectf': None}
+        data = {'test':        None,
+                'file':        None,
+                'expect':      None,
+                'expectf':     None,
+                'expectregex': None}
 
         with open(self.fn) as f:
             for line in f.readlines():
@@ -41,17 +43,15 @@ class Test:
                 v = v[:-1]
             new_data[k] = v
 
-        self.test    = new_data['test']
-        self.file    = new_data['file']
-        self.expect  = new_data['expect']
-        self.expectf = new_data['expectf']
+        self.test        = new_data['test']
+        self.file        = new_data['file']
+        self.expect      = new_data['expect']
+        self.expectf     = new_data['expectf']
+        self.expectregex = new_data['expectregex']
 
     def run(self):
         print('Running test: '+self.fn)
         print('              '+self.test)
-
-        #php = subprocess.Popen(['php'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        #print(php.communicate(input=bytes(self.file, 'utf-8'))[0])
 
         # Compile PyHP to PHP with default options
         hp = hotpotato.HotPotato()
@@ -59,7 +59,7 @@ class Test:
         self.pyhp_output = hp.php()
 
         # Execute PHP
-        php = subprocess.Popen(['php'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        php = subprocess.Popen(['php'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         self.raw_php_output = php.communicate(input=bytes(self.pyhp_output, 'utf-8'))[0]
         self.php_output = self.raw_php_output.decode('utf-8')
 
@@ -81,6 +81,9 @@ class Test:
 
             assertion = regex.match(self.php_output) is not None
 
+        elif self.expectregex is not None:
+            assertion = re.match(self.expectregex, self.php_output)
+
         else:
             raise RuntimeError
 
@@ -92,6 +95,8 @@ class Test:
                 print('Expected\n%s\nto be\n%s' % (repr(self.php_output), repr(self.expect)))
             elif self.expectf is not None:
                 print('Expected\n%s\nto match\n%s' % (repr(self.php_output), repr(self.expectf)))
+            elif self.expectregex is not None:
+                print('Expected\n%s\nto match\n%s' % (repr(self.php_output), repr(self.expectregex)))
             raise
         else:
             print('Success!')
