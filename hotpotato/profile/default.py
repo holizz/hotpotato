@@ -9,18 +9,27 @@ class Macros(object):
         return self.hp._php(php, self)
 
     def _concat(self, *args):
+        """Replace PHP's . operator
+
+        """
         return ' . '.join([self.__p(a) for a in args])
 
-    def _const(self, constant):
-        return constant.id
-
     def _append(self, target, value):
+        """Replace PHP's []= idiom
+
+        """
         return self.__p(target) + '[] = ' + self.__p(value)
 
     def _new(self, cls):
+        """Replace PHP's "new" construct
+
+        """
         return 'new ' + cls.id
 
     def _raw(self, name):
+        """For names that aren't $variables
+
+        """
         return name.id
 
 
