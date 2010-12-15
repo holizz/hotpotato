@@ -63,6 +63,9 @@ class Test:
         self.raw_php_output = php.communicate(input=bytes(self.pyhp_output, 'utf-8'))[0]
         self.php_output = self.raw_php_output.decode('utf-8')
 
+        if self.php_output.endswith('\n'):
+            self.php_output = self.php_output[:-1]
+
         if self.expect is not None:
             assertion = self.php_output == self.expect
 
