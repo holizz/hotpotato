@@ -6,6 +6,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 
 import hotpotato
 
@@ -20,13 +21,15 @@ class Test:
                   '--FILE--':        'file',
                   '--EXPECT--':      'expect',
                   '--EXPECTF--':     'expectf',
-                  '--EXPECTREGEX--': 'expectregex'}
+                  '--EXPECTREGEX--': 'expectregex',
+                  '--STDIN--':       'stdin'}
 
         data = {'test':        None,
                 'file':        None,
                 'expect':      None,
                 'expectf':     None,
-                'expectregex': None}
+                'expectregex': None,
+                'stdin':       ''}
 
         with open(self.fn) as f:
             for line in f.readlines():
@@ -48,6 +51,7 @@ class Test:
         self.expect      = new_data['expect']
         self.expectf     = new_data['expectf']
         self.expectregex = new_data['expectregex']
+        self.stdin       = new_data['stdin'] + '\n'
 
     def run(self):
         print('Running test: '+self.fn)
@@ -58,9 +62,13 @@ class Test:
         hp.load('file.py', self.file)
         self.pyhp_output = hp.php()
 
+        # Save PHP to a tmp file
+        fd,path = tempfile.mkstemp()
+        os.write(fd, bytes(self.pyhp_output, 'utf-8'))
+
         # Execute PHP
-        php = subprocess.Popen(['php'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        self.raw_php_output = php.communicate(input=bytes(self.pyhp_output, 'utf-8'))[0]
+        php = subprocess.Popen(['php', path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        self.raw_php_output = php.communicate(input=bytes(self.stdin, 'utf-8'))[0]
         self.php_output = self.raw_php_output.decode('utf-8')
 
         if self.php_output.endswith('\n'):

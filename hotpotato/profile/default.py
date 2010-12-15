@@ -17,6 +17,12 @@ class Macros(object):
     def _append(self, target, value):
         return self.__p(target) + '[] = ' + self.__p(value)
 
+    def _new(self, cls):
+        return 'new ' + cls.id
+
+    def _raw(self, name):
+        return name.id
+
 
 class Actions(object):
     special_names = {
@@ -55,7 +61,7 @@ class Actions(object):
                 self.output.append(b)
             else:
                 self.output.append(self.p(b))
-        return ';\n'.join(self.output + [''])
+        return '\n'.join(self.output + [''])
 
     ## Bits and bobs #########################################################
 
@@ -63,7 +69,7 @@ class Actions(object):
         return ', '.join([self.p(b) for b in a.args])
 
     def arg(self, a):
-        return '$'+a.arg
+        return '$' + a.arg
 
     ## Module ################################################################
 
@@ -95,10 +101,10 @@ class Actions(object):
             return self.statements(assignments)
 
         else:
-            return self.p(a.targets[0]) + ' = ' + self.p(a.value)
+            return self.p(a.targets[0]) + ' = ' + self.p(a.value) + ';'
 
     def Expr(self, a):
-        return self.p(a.value)
+        return self.p(a.value) + ';'
 
     def For(self, a):
         return 'foreach ( ' + \
@@ -119,14 +125,25 @@ class Actions(object):
                 self.statements(a.body) + '}' + orelse
 
     def FunctionDef(self, a):
-        return 'function '+a.name+' ('+self.p(a.args)+') {\n' + \
+        return 'function ' + a.name + ' (' + self.p(a.args) + ') {\n' + \
                 self.statements(a.body) + '}'
 
     def Return(self, a):
-        return 'return '+self.p(a.value)
+        return 'return ' + self.p(a.value) + ';'
+
+    def ClassDef(self, a):
+        extends = ''
+        if a.bases != []:
+            extends = 'extends ' + ', '.join([n.id for n in a.bases])
+
+        return 'class ' + a.name + extends + ' {\n' + \
+                self.statements(a.body) + '}'
+
+    def Pass(self, a):
+        return ''
 
     def Global(self, a):
-        return 'global '+', '.join(['$'+n for n in a.names])
+        return 'global ' + ', '.join(['$' + n for n in a.names]) + ';'
 
     ## Expressions ###########################################################
 
@@ -141,7 +158,7 @@ class Actions(object):
     def Name(self, a):
         if a.id in self.special_names:
             return self.special_names[a.id]
-        return '$'+a.id
+        return '$' + a.id
 
     def Subscript(self, a):
         return self.p(a.value) + '[' + self.p(a.slice) + ']'

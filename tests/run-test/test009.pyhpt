@@ -1,0 +1,11 @@
+--TEST--
+print_r(Object)
+--FILE--
+class Foo:
+  pass
+foo = _new(Foo)
+print_r(foo)
+--EXPECTF--
+Foo Object
+(
+)
