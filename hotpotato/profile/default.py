@@ -47,15 +47,8 @@ class Actions(object):
             return self
         return self.parent._get_context()
 
-    ## Module ################################################################
-
-    def Module(self, a):
-        self.statement_context = True
-        return self.statements(a.body)
-
-    ## Statements ############################################################
-
     def statements(self, s):
+        self.output = []
         self.statement_context = True
         for b in s:
             if type(b) == str:
@@ -63,6 +56,22 @@ class Actions(object):
             else:
                 self.output.append(self.p(b))
         return ';\n'.join(self.output + [''])
+
+    ## Bits and bobs #########################################################
+
+    def arguments(self, a):
+        return ', '.join([self.p(b) for b in a.args])
+
+    def arg(self, a):
+        return '$'+a.arg
+
+    ## Module ################################################################
+
+    def Module(self, a):
+        self.statement_context = True
+        return self.statements(a.body)
+
+    ## Statements ############################################################
 
     def Assign(self, a):
         if type(a.targets[0]) == ast.Tuple:
@@ -104,10 +113,20 @@ class Actions(object):
         elif a.orelse[0].__class__ is ast.If:
             orelse = ' else' + self.p(a.orelse[0])
         else:
-            orelse = ' else {\n' + self.p(a.orelse[0]) + '}'
+            orelse = ' else {\n' + self.statements(a.orelse) + '}'
 
         return 'if ( ' + self.p(a.test) + ' ) {\n' + \
                 self.statements(a.body) + '}' + orelse
+
+    def FunctionDef(self, a):
+        return 'function '+a.name+' ('+self.p(a.args)+') {\n' + \
+                self.statements(a.body) + '}'
+
+    def Return(self, a):
+        return 'return '+self.p(a.value)
+
+    def Global(self, a):
+        return 'global '+', '.join(['$'+n for n in a.names])
 
     ## Expressions ###########################################################
 
