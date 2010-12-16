@@ -1,0 +1,9 @@
+--TEST--
+Simple While Loop Test
+--FILE--
+a=1
+while a<10:
+	echo(a)
+	a += 1
+--EXPECT--
+123456789

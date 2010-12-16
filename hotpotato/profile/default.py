@@ -34,6 +34,12 @@ class Macros(object):
         """
         return name.id
 
+    def _static(self, target, value):
+        """PHP's "static"
+
+        """
+        return 'static ' + self.__p(ast.Assign(targets=[target],value=value))
+
     ## Decorators
 
     def _abstract(self, s):
@@ -125,15 +131,22 @@ class Actions(object):
         else:
             return self.p(a.targets[0]) + ' = ' + self.p(a.value) + ';'
 
+    def AugAssign(self, a):
+        return self.p(a.target) + ' ' + self.p(a.op) + '= ' + self.p(a.value) + ';'
+
     def Expr(self, a):
         return self.p(a.value) + ';'
 
     def For(self, a):
         return 'foreach ( ' + \
                 self.p(a.iter) +  ' as ' +  self.p(a.target) + \
-                ') {\n' + \
+                ' ) {\n' + \
                 self.statements(a.body) + \
                 '}'
+
+    def While(self, a):
+        return 'while ( ' + self.p(a.test) + ' ) {\n' + \
+                self.statements(a.body) + '}'
 
     def If(self, a):
         if a.orelse == []:
@@ -147,7 +160,7 @@ class Actions(object):
                 self.statements(a.body) + '}' + orelse
 
     def FunctionDef(self, a):
-        return 'function ' + a.name + ' (' + self.p(a.args) + ') {\n' + \
+        return 'function ' + a.name + '(' + self.p(a.args) + ') {\n' + \
                 self.statements(a.body) + '}'
 
     def Return(self, a):

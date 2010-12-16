@@ -1,0 +1,23 @@
+--TEST--
+Function call with global and static variables
+--FILE--
+error_reporting(0)
+a = 10
+
+def Test():
+	_static(a,1)
+	global b
+	c = 1
+	b = 5
+	echo(_concat(a," ",b," "))
+	a+=1
+	c+=1
+	echo(_concat(a," ",c," "))
+
+Test()
+echo(_concat(a," ",b," ",c," "))
+Test()
+echo(_concat(a," ",b," ",c," "))
+Test()
+--EXPECT--
+1 5 2 2 10 5  2 5 3 2 10 5  3 5 4 2 
