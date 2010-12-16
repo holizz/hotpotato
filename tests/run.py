@@ -16,6 +16,8 @@ class Test:
         self.fn = fn
         self.parse()
 
+        self.tty = os.isatty(sys.stdout.fileno())
+
         self.php_header = '<?php'
         for x in ['post', 'get']:
             self.php_header += """
@@ -24,6 +26,18 @@ class Test:
                     parse_str($%(x)s, &$_%(X)s);
                 """ % {'x':x,'X':x.upper()}
         self.php_header += '?>'
+
+    def _colour(self, colour, s):
+        if self.tty:
+            return '\x1b[%dm%s\x1b[0m' % (colour, s)
+        else:
+            return s
+
+    def _red(self, s):
+        return self._colour(31, s)
+
+    def _green(self, s):
+        return self._colour(32, s)
 
     def parse(self):
         header = {'--TEST--':        'test',
@@ -119,7 +133,7 @@ class Test:
         try:
             assert assertion
         except AssertionError:
-            print('Failure!')
+            print(self._red('Failure!'))
             if self.expect is not None:
                 print('Expected\n%s\nto be\n%s' % (repr(self.php_output), repr(self.expect)))
             elif self.expectf is not None:
@@ -128,7 +142,7 @@ class Test:
                 print('Expected\n%s\nto match\n%s' % (repr(self.php_output), repr(self.expectregex)))
             raise
         else:
-            print('Success!')
+            print(self._green('Success!'))
 
 
 if __name__ == '__main__':
