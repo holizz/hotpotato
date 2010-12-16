@@ -1,0 +1,27 @@
+--TEST--
+ZE2 An abstract class cannot be instantiated
+[EXPECTF modified to suit reality]
+--SKIPIF--
+<?php if (version_compare(zend_version(), '2.0.0-dev', '<')) die('skip ZendEngine 2 needed'); ?>
+--FILE--
+
+@_abstract
+class fail:
+    @_abstract
+    def show():
+        pass
+
+class pass_(fail):
+    def show():
+        echo("Call to function show()\n")
+
+t2 = _new(pass_)
+t2.show()
+
+t = _new(fail)
+t.show()
+
+echo("Done\n") # shouldn't be displayed
+--EXPECTF--
+Call to function show()
+PHP Fatal error:  Cannot instantiate abstract class fail in %s on line %d

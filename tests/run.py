@@ -45,6 +45,7 @@ class Test:
                   '--EXPECT--':      'expect',
                   '--EXPECTF--':     'expectf',
                   '--EXPECTREGEX--': 'expectregex',
+                  '--SKIPIF--':      'skipif',
                   '--STDIN--':       'stdin',
                   '--POST--':        'post',
                   '--GET--':         'get'}
@@ -54,6 +55,7 @@ class Test:
                 'expect':      None,
                 'expectf':     None,
                 'expectregex': None,
+                'skipif':      None,
                 'stdin':       '',
                 'post':        '',
                 'get':         ''}
@@ -78,6 +80,7 @@ class Test:
         self.expect      = new_data['expect']
         self.expectf     = new_data['expectf']
         self.expectregex = new_data['expectregex']
+        self.skipif      = new_data['skipif']
         self.stdin       = new_data['stdin'] + '\n'
         self.post        = new_data['post']
         self.get         = new_data['get']
@@ -94,6 +97,8 @@ class Test:
         # Save PHP to a tmp file
         fd,path = tempfile.mkstemp()
         os.write(fd, bytes(self.php_header, 'utf-8'))
+        if self.skipif is not None:
+            os.write(fd, bytes(self.skipif, 'utf-8'))
         os.write(fd, bytes(self.pyhp_output, 'utf-8'))
 
         # Execute PHP
@@ -116,7 +121,7 @@ class Test:
             e = re.sub(r'\\%d', r'\d+', e)
             e = re.sub(r'\\%i', r'[+-]?\d+', e)
             e = re.sub(r'\\%f', r'[+-]?\d+(\.\d+)?', e)
-            e = re.sub(r'\\%s', r'\w+', e)
+            e = re.sub(r'\\%s', r'.+', e)
             e = re.sub(r'\\%x', r'[0-9a-fA-F]+', e)
             e = re.sub(r'\\%c', r'\w', e)
             e = '^'+e+'$'

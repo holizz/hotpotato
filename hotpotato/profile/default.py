@@ -8,6 +8,8 @@ class Macros(object):
     def __p(self, php):
         return self.hp._php(php, self)
 
+    ## Callable macros
+
     def _concat(self, *args):
         """Replace PHP's . operator
 
@@ -32,6 +34,11 @@ class Macros(object):
         """
         return name.id
 
+    ## Decorators
+
+    def _abstract(self, s):
+        return 'abstract ' + s
+
 
 class Actions(object):
     special_names = {
@@ -45,6 +52,9 @@ class Actions(object):
     def __init__(self, hp, parent):
         self.hp = hp
         self.parent = parent
+
+        self.macros = self.hp.macros(self.hp)
+
         self.output = []
         self.statement_context = False
         self.var_count = 0
@@ -71,6 +81,9 @@ class Actions(object):
             else:
                 self.output.append(self.p(b))
         return '\n'.join(self.output + [''])
+
+    def macro(self, func, *args):
+        return self.macros.__getattribute__(func)(*args)
 
     ## Bits and bobs #########################################################
 
@@ -143,10 +156,15 @@ class Actions(object):
     def ClassDef(self, a):
         extends = ''
         if a.bases != []:
-            extends = 'extends ' + ', '.join([n.id for n in a.bases])
+            extends = ' extends ' + ', '.join([n.id for n in a.bases])
 
-        return 'class ' + a.name + extends + ' {\n' + \
-                self.statements(a.body) + '}'
+        r = 'class ' + a.name + extends + ' {\n' + \
+            self.statements(a.body) + '}'
+
+        for func in reversed(a.decorator_list):
+            r = self.macro(func.id, r)
+
+        return r
 
     def Pass(self, a):
         return ''
@@ -157,12 +175,15 @@ class Actions(object):
     ## Expressions ###########################################################
 
     def Call(self, a):
-        m = self.hp.macros(self.hp)
-        if a.func.id in dir(m) and not a.func.id.startswith('__'):
-            return m.__getattribute__(a.func.id)(*a.args)
-        else:
-            return a.func.id + '( ' + \
-                    ', '.join([self.p(b) for b in a.args]) + ' )'
+        if type(a.func) == ast.Attribute:
+            return self.p(a.func.value) + '->' + a.func.attr + '()'
+
+        elif type(a.func) == ast.Name:
+            if a.func.id in dir(self.macros) and not a.func.id.startswith('__'):
+                return self.macro(a.func.id, *a.args)
+            else:
+                return a.func.id + '( ' + \
+                        ', '.join([self.p(b) for b in a.args]) + ' )'
 
     def Name(self, a):
         if a.id in self.special_names:
