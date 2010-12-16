@@ -95,7 +95,7 @@ class Test:
         self.pyhp_output = hp.php()
 
         # Save PHP to a tmp file
-        fd,path = tempfile.mkstemp()
+        fd,path = tempfile.mkstemp(dir=os.path.dirname(self.fn))
         os.write(fd, bytes(self.php_header, 'utf-8'))
         if self.skipif is not None:
             os.write(fd, bytes(self.skipif, 'utf-8'))
@@ -107,6 +107,9 @@ class Test:
         php = subprocess.Popen(['php', path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
         self.raw_php_output = php.communicate(input=bytes(self.stdin, 'utf-8'))[0]
         self.php_output = self.raw_php_output.decode('utf-8')
+
+        os.close(fd)
+        os.unlink(path)
 
         if self.php_output.endswith('\n'):
             self.php_output = self.php_output[:-1]

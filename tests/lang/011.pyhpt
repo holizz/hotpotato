@@ -1,0 +1,17 @@
+--TEST--
+Testing nested functions
+--FILE--
+def F():
+	a = "Hello "
+	return(a)
+
+def G():
+  _static(myvar,4)
+
+  echo(_concat(myvar," "))
+  echo(F())
+  echo(myvar)
+
+G()
+--EXPECT--
+4 Hello 4

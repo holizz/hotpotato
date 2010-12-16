@@ -1,0 +1,13 @@
+--TEST--
+Testing user-defined function falling out of an If into another
+--FILE--
+a = 1
+def Test (a):
+	if (a<3):
+		return(3)
+
+if (a < Test(a)):
+	echo(_concat(a,"\n"))
+	a+=1
+--EXPECT--
+1
