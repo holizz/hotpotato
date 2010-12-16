@@ -12,6 +12,14 @@ import hotpotato
 
 
 class Test:
+    php_header = """
+<?php
+$post = getenv('PHP_POST');
+if($post)
+  parse_str($post, &$_POST);
+?>
+""".strip()
+
     def __init__(self, fn):
         self.fn = fn
         self.parse()
@@ -22,14 +30,16 @@ class Test:
                   '--EXPECT--':      'expect',
                   '--EXPECTF--':     'expectf',
                   '--EXPECTREGEX--': 'expectregex',
-                  '--STDIN--':       'stdin'}
+                  '--STDIN--':       'stdin',
+                  '--POST--':        'post'}
 
         data = {'test':        None,
                 'file':        None,
                 'expect':      None,
                 'expectf':     None,
                 'expectregex': None,
-                'stdin':       ''}
+                'stdin':       '',
+                'post':        ''}
 
         with open(self.fn) as f:
             for line in f.readlines():
@@ -52,6 +62,7 @@ class Test:
         self.expectf     = new_data['expectf']
         self.expectregex = new_data['expectregex']
         self.stdin       = new_data['stdin'] + '\n'
+        self.post        = new_data['post']
 
     def run(self):
         print('Running test: '+self.fn)
@@ -64,10 +75,12 @@ class Test:
 
         # Save PHP to a tmp file
         fd,path = tempfile.mkstemp()
+        os.write(fd, bytes(self.php_header, 'utf-8'))
         os.write(fd, bytes(self.pyhp_output, 'utf-8'))
 
         # Execute PHP
-        php = subprocess.Popen(['php', path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        env = {'PHP_POST': self.post}
+        php = subprocess.Popen(['php', path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
         self.raw_php_output = php.communicate(input=bytes(self.stdin, 'utf-8'))[0]
         self.php_output = self.raw_php_output.decode('utf-8')
 

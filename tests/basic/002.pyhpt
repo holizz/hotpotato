@@ -1,0 +1,8 @@
+--TEST--
+Simple POST Method test
+--POST--
+a=Hello+World
+--FILE--
+echo(_POST['a'])
+--EXPECT--
+Hello World
