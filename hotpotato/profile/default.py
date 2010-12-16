@@ -213,6 +213,16 @@ class Actions(object):
             return 'pow(' + self.p(a.left) + ', ' + self.p(a.right) + ')'
         return self.p(a.left) + ' ' + self.p(a.op) + ' ' + self.p(a.right)
 
+    # Bitwise
+
+    def BitOr(self, a):
+        return '|'
+
+    def BitAnd(self, a):
+        return '&'
+
+    # Mathematical
+
     def Add(self, a):
         return '+'
 
