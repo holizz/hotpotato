@@ -12,17 +12,18 @@ import hotpotato
 
 
 class Test:
-    php_header = """
-<?php
-$post = getenv('PHP_POST');
-if($post)
-  parse_str($post, &$_POST);
-?>
-""".strip()
-
     def __init__(self, fn):
         self.fn = fn
         self.parse()
+
+        self.php_header = '<?php'
+        for x in ['post', 'get']:
+            self.php_header += """
+                $%(x)s = getenv('PHP_%(X)s');
+                if($%(x)s)
+                    parse_str($%(x)s, &$_%(X)s);
+                """ % {'x':x,'X':x.upper()}
+        self.php_header += '?>'
 
     def parse(self):
         header = {'--TEST--':        'test',
@@ -31,7 +32,8 @@ if($post)
                   '--EXPECTF--':     'expectf',
                   '--EXPECTREGEX--': 'expectregex',
                   '--STDIN--':       'stdin',
-                  '--POST--':        'post'}
+                  '--POST--':        'post',
+                  '--GET--':         'get'}
 
         data = {'test':        None,
                 'file':        None,
@@ -39,7 +41,8 @@ if($post)
                 'expectf':     None,
                 'expectregex': None,
                 'stdin':       '',
-                'post':        ''}
+                'post':        '',
+                'get':         ''}
 
         with open(self.fn) as f:
             for line in f.readlines():
@@ -63,6 +66,7 @@ if($post)
         self.expectregex = new_data['expectregex']
         self.stdin       = new_data['stdin'] + '\n'
         self.post        = new_data['post']
+        self.get         = new_data['get']
 
     def run(self):
         print('Running test: '+self.fn)
@@ -79,7 +83,8 @@ if($post)
         os.write(fd, bytes(self.pyhp_output, 'utf-8'))
 
         # Execute PHP
-        env = {'PHP_POST': self.post}
+        env = {'PHP_POST': self.post,
+               'PHP_GET': self.get}
         php = subprocess.Popen(['php', path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
         self.raw_php_output = php.communicate(input=bytes(self.stdin, 'utf-8'))[0]
         self.php_output = self.raw_php_output.decode('utf-8')
