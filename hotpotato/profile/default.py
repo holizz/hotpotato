@@ -216,6 +216,9 @@ class Actions(object):
     def Add(self, a):
         return '+'
 
+    def Sub(self, a):
+        return '-'
+
     def Mult(self, a):
         return '*'
 
