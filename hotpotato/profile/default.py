@@ -1,7 +1,7 @@
 import ast
 
 
-class Macros(object):
+class Macros:
     def __init__(self, hp):
         self.hp = hp
 
@@ -58,7 +58,7 @@ class Macros(object):
         return 'abstract ' + s
 
 
-class Actions(object):
+class Actions:
     special_names = {
             'False': 'false',
             'None': 'null',

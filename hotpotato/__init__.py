@@ -3,7 +3,7 @@ import ast
 from hotpotato.profile import default
 
 
-class HotPotato(object):
+class HotPotato:
     def __init__(self, debug=False, actions=default.Actions, macros=default.Macros):
         self.debug = debug
         self.actions = actions
@@ -33,7 +33,7 @@ class HotPotato(object):
                 raise
 
 
-class CommandLine(object):
+class CommandLine:
     def __init__(self, hotpotato=None):
         self.hotpotato = hotpotato if hotpotato else HotPotato()
 
