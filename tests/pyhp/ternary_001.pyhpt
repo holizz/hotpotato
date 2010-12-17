@@ -1,0 +1,11 @@
+--TEST--
+x if y else z => y ? x : z
+--FILE--
+x = True
+print('Passes' if x else 'Fails')
+print('\n')
+x = False
+print('Fails' if x else 'Passes')
+--EXPECT--
+Passes
+Passes

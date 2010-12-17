@@ -227,6 +227,9 @@ class Actions(object):
     def Index(self, a):
         return self.p(a.value)
 
+    def IfExp(self, a):
+        return self.p(a.test) + ' ? ' + self.p(a.body) + ' : ' + self.p(a.orelse)
+
     def ListComp(self, a):
         g = a.generators[0]
 
