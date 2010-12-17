@@ -40,6 +40,18 @@ class Macros(object):
         """
         return 'static ' + self.__p(ast.Assign(targets=[target],value=value))
 
+    def _cast(self, target, value):
+        """_cast(target, value) == (target) value
+
+        """
+        return '(' + target.id + ') ' + self.__p(value)
+
+    def _ref(self, var):
+        """_ref(var) == &$var
+
+        """
+        return '&' + self.__p(var)
+
     ## Decorators
 
     def _abstract(self, s):
@@ -82,7 +94,7 @@ class Actions(object):
         self.output = []
         self.statement_context = True
         for b in s:
-            if type(b) == str:
+            if isinstance(b,str):
                 self.output.append(b)
             else:
                 self.output.append(self.p(b))
@@ -108,7 +120,7 @@ class Actions(object):
     ## Statements ############################################################
 
     def Assign(self, a):
-        if type(a.targets[0]) == ast.Tuple:
+        if isinstance(a.targets[0], ast.Tuple):
 
             # $__pyhp_array__ = $values
             target = self.pyhp_var('assign')
@@ -188,20 +200,26 @@ class Actions(object):
     ## Expressions ###########################################################
 
     def Call(self, a):
-        if type(a.func) == ast.Attribute:
-            return self.p(a.func.value) + '->' + a.func.attr + '()'
+        if isinstance(a.func, ast.Attribute):
+            f = self.p(a.func.value) + '->' + a.func.attr
+            f = self.p(a.func)
 
-        elif type(a.func) == ast.Name:
-            if a.func.id in dir(self.macros) and not a.func.id.startswith('__'):
+        elif isinstance(a.func, ast.Name):
+            if a.func.id in dir(self.macros) \
+                    and not a.func.id.startswith('__'):
                 return self.macro(a.func.id, *a.args)
             else:
-                return a.func.id + '( ' + \
-                        ', '.join([self.p(b) for b in a.args]) + ' )'
+                f = a.func.id
+
+        return f + '( ' +  ', '.join([self.p(b) for b in a.args]) + ' )'
 
     def Name(self, a):
         if a.id in self.special_names:
             return self.special_names[a.id]
         return '$' + a.id
+
+    def Attribute(self, a):
+        return self.p(a.value) + '->' + a.attr
 
     def Subscript(self, a):
         return self.p(a.value) + '[' + self.p(a.slice) + ']'
@@ -243,7 +261,7 @@ class Actions(object):
     ## BinOp
 
     def BinOp(self, a):
-        if type(a.op) == ast.Pow:
+        if isinstance(a.op, ast.Pow):
             return 'pow(' + self.p(a.left) + ', ' + self.p(a.right) + ')'
         return self.p(a.left) + ' ' + self.p(a.op) + ' ' + self.p(a.right)
 

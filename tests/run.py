@@ -71,9 +71,10 @@ class Test:
 
         new_data = {}
         for k,v in data.items():
-            if v is not None and v.endswith('\n'):
-                v = v[:-1]
-            new_data[k] = v
+            if isinstance(data[k], str):
+                new_data[k] = data[k].rstrip('\n')
+            else:
+                new_data[k] = data[k]
 
         self.test        = new_data['test']
         self.file        = new_data['file']
@@ -111,8 +112,7 @@ class Test:
         os.close(fd)
         os.unlink(path)
 
-        if self.php_output.endswith('\n'):
-            self.php_output = self.php_output[:-1]
+        self.php_output = self.php_output.rstrip('\n')
 
         if self.expect is not None:
             assertion = self.php_output == self.expect
