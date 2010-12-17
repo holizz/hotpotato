@@ -1,0 +1,33 @@
+--TEST--
+Python's del statement
+--FILE--
+a = array(1,2,3)
+print_r(a)
+del a[0]
+print_r(a)
+
+b = 4
+c = 5
+print(_concat(b, '\n'))
+print(_concat(c, '\n'))
+del b, c
+print(_concat(b, '\n'))
+print(_concat(c, '\n'))
+print('Done')
+--EXPECT--
+Array
+(
+    [0] => 1
+    [1] => 2
+    [2] => 3
+)
+Array
+(
+    [1] => 2
+    [2] => 3
+)
+4
+5
+
+
+Done

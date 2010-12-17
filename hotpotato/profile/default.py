@@ -143,6 +143,10 @@ class Actions(object):
         else:
             return self.p(a.targets[0]) + ' = ' + self.p(a.value) + ';'
 
+    def Delete(self, a):
+        return self.p(ast.Call(func=ast.Name(id='unset'),
+                               args=a.targets)) + ';'
+
     def AugAssign(self, a):
         return self.p(a.target) + ' ' + self.p(a.op) + '= ' + self.p(a.value) + ';'
 
