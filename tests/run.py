@@ -158,10 +158,10 @@ if __name__ == '__main__':
 
     tests = None
 
-    if len(argv) > 0:
+    if argv:
         tests = argv
 
-    if tests is None:
+    if not tests:
         tests = sorted(glob.glob('tests/*/*.pyhpt'))
 
     for test in tests:
