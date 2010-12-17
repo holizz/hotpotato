@@ -20,7 +20,7 @@ class Macros(object):
         """Replace PHP's []= idiom
 
         """
-        return self.__p(target) + '[] = ' + self.__p(value)
+        return self.__p(target) + '[] = ' + self.__p(value) + ';'
 
     def _new(self, cls):
         """Replace PHP's "new" construct
