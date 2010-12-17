@@ -25,7 +25,7 @@ class HotPotato(object):
         c = a.__class__
         actions = self.actions(self, parent)
         try:
-            return actions.__getattribute__(c.__name__)(a)
+            return getattr(actions, c.__name__)(a)
         except AttributeError:
             if self.debug:
                 return repr(a)

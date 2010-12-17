@@ -101,7 +101,7 @@ class Actions(object):
         return '\n'.join(self.output + [''])
 
     def macro(self, func, *args):
-        return self.macros.__getattribute__(func)(*args)
+        return getattr(self.macros, func)(*args)
 
     ## Bits and bobs #########################################################
 
