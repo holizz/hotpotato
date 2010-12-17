@@ -18,6 +18,7 @@ class Test:
 
         self.tty = os.isatty(sys.stdout.fileno())
 
+        # Setting $_GET and $_POST for certain tests
         self.php_header = '<?php'
         for x in ['post', 'get']:
             self.php_header += """
