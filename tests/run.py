@@ -105,7 +105,7 @@ class Test:
         # Execute PHP
         env = {'PHP_POST': self.post,
                'PHP_GET': self.get}
-        php = subprocess.Popen(['php', path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
+        php = subprocess.Popen(['php', '--no-php-ini', path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
         self.raw_php_output = php.communicate(input=bytes(self.stdin, 'utf-8'))[0]
         self.php_output = self.raw_php_output.decode('utf-8')
 
@@ -133,7 +133,7 @@ class Test:
             assertion = regex.match(self.php_output) is not None
 
         elif self.expectregex is not None:
-            assertion = re.match(self.expectregex, self.php_output)
+            assertion = re.match(self.expectregex, self.php_output, re.DOTALL)
 
         else:
             raise RuntimeError
