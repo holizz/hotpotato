@@ -1,0 +1,11 @@
+--TEST--
+Assignment with multiple targets
+--FILE--
+a,b,c = range(1,3)
+print(_concat(a,'\n'))
+print(_concat(b,'\n'))
+print(_concat(c,'\n'))
+--EXPECT--
+1
+2
+3
